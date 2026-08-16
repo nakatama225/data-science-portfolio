@@ -60,7 +60,7 @@ uv run jupyter lab         # ノートブックを開く
 
 ## 構成
 
-```
+```text
 notebooks/  探索と試行錯誤の記録
 src/        再利用する部品（特徴量の作成・検証の分割・学習）
 tests/      部品の検査

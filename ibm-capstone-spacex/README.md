@@ -26,7 +26,7 @@ IBM Data Science Professional Certificate の最終課題（2023年8月）を出
 
 ### 1. 「考えた記録」と「再利用する部品」を分ける
 
-```
+```text
 notebooks/   分析を進めたときの記録。当時のまま残す
 src/         そこから切り出した、何度でも同じ結果を出せる部品
 tests/       部品の振る舞いを固定する検査
@@ -65,7 +65,7 @@ collector = SpaceXLaunchCollector(fetch=用意した応答を返すもの)  # �
 
 このとき **標準化の基準値をどのデータから計算するか** が問題になる。
 
-```
+```text
 元の手順:  全データで基準値を計算 → 訓練用と検証用に分割 → 学習
 この版  :  訓練用と検証用に分割 → 訓練用だけで基準値を計算 → 学習
 ```
@@ -161,7 +161,11 @@ uv run jupyter lab
 ```python
 import pandas as pd
 from spacex_capstone.preprocessing.features import build_feature_matrix
-from spacex_capstone.modeling.training import default_model_specs, split_train_test, train_all
+from spacex_capstone.modeling.training import (
+    default_model_specs,
+    split_train_test,
+    train_all,
+)
 
 frame = pd.read_csv("data/processed/dataset_part_2.csv")
 features = build_feature_matrix(frame)
