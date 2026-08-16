@@ -104,6 +104,43 @@ class Test既定のモデル定義:
         # 規模が桁違いに増えたら気づけるよう、上限を置いておく。
         assert total < 100_000
 
+    def test_乱数を使うモデルは種が固定されている(self) -> None:
+        """種を固定しないと、実行のたびに結果が変わる。
+
+        決定木は分割に使う特徴量を無作為に選ぶ設定を探索範囲に含むため、
+        固定前は交差検証の平均正解率が 0.905 と 0.916 に振れた。
+        結果が再現しないと、改良したのか偶然良く出たのかを区別できない。
+        """
+        for spec in default_model_specs():
+            estimator = spec.estimator_factory()
+            if "random_state" not in estimator.get_params():
+                continue  # 乱数を使わないモデル（k近傍法など）
+            assert estimator.get_params()["random_state"] is not None, (
+                f"{spec.name} の乱数の種が固定されていない"
+            )
+
+    def test_同じ設定で二度学習しても同じ結果になる(self) -> None:
+        """再現性そのものを検査する。
+
+        種の固定が外れたときに、数値がずれてから気づくのではなく
+        ここで落ちるようにしている。
+        """
+        rng = np.random.default_rng(seed=0)
+        features = rng.normal(size=(40, 4))
+        target = (features[:, 0] + features[:, 1] > 0).astype(int)
+        spec = next(s for s in default_model_specs() if s.name == "決定木")
+        small = ModelSpec(
+            name=spec.name,
+            estimator_factory=spec.estimator_factory,
+            # 無作為性が入る設定だけを残した小さな探索範囲。
+            param_grid={"splitter": ["random"], "max_features": ["sqrt"]},
+        )
+
+        first = train_with_grid_search(small, features, target, cv_folds=3)
+        second = train_with_grid_search(small, features, target, cv_folds=3)
+
+        assert first.cv_score == second.cv_score
+
 
 class Test学習の流れ:
     def test_標準化がモデルの手前に入る(self) -> None:

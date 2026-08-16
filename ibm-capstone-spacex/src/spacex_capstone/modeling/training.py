@@ -82,7 +82,19 @@ def default_model_specs() -> tuple[ModelSpec, ...]:
 
     Returns:
         モデル定義の並び。
+
+    Note:
+        乱数を使うモデルには `random_state` を固定して渡している。
+        決定木は分割に使う特徴量を無作為に選ぶ設定（`max_features='sqrt'`、
+        `splitter='random'`）を探索範囲に含むため、**種を固定しないと
+        実行のたびに結果が変わる**。実際に固定前は、交差検証の平均正解率が
+        0.905 と 0.916、検証データの正解率が 0.722 と 0.667 に振れた。
+
+        結果が再現しないと、モデルを改良したのか偶然良く出たのかを
+        区別できなくなる。
     """
+    from functools import partial
+
     import numpy as np
     from sklearn.linear_model import LogisticRegression
     from sklearn.neighbors import KNeighborsClassifier
@@ -92,14 +104,19 @@ def default_model_specs() -> tuple[ModelSpec, ...]:
     return (
         ModelSpec(
             name="ロジスティック回帰",
-            estimator_factory=LogisticRegression,
+            # このモデルは今の設定（lbfgs）では乱数を使わないが、
+            # 種を受け付けるものには一律で渡す。設定を変えたときに
+            # 固定し忘れる余地を残さないため。
+            estimator_factory=partial(
+                LogisticRegression, random_state=DEFAULT_RANDOM_STATE
+            ),
             # C は「訓練データへの当てはめをどれだけ優先するか」。
             # 小さいほど係数が抑えられ、過剰な当てはめを避ける。
             param_grid={"C": [0.01, 0.1, 1], "penalty": ["l2"], "solver": ["lbfgs"]},
         ),
         ModelSpec(
             name="サポートベクターマシン",
-            estimator_factory=SVC,
+            estimator_factory=partial(SVC, random_state=DEFAULT_RANDOM_STATE),
             param_grid={
                 "kernel": ["linear", "rbf", "poly", "sigmoid"],
                 "C": np.logspace(-3, 3, 5).tolist(),
@@ -108,7 +125,9 @@ def default_model_specs() -> tuple[ModelSpec, ...]:
         ),
         ModelSpec(
             name="決定木",
-            estimator_factory=DecisionTreeClassifier,
+            estimator_factory=partial(
+                DecisionTreeClassifier, random_state=DEFAULT_RANDOM_STATE
+            ),
             param_grid={
                 "criterion": ["gini", "entropy"],
                 "splitter": ["best", "random"],
