@@ -1,0 +1,67 @@
+# このファイルは、リポジトリ全体をまとめる場所（ワークスペースの親）である。
+#
+# 分析プロジェクトは1つのリポジトリの中に複数入る。それぞれが別々の
+# ライブラリを必要とするが、**環境は1つに揃えたい**（プロジェクトごとに
+# 仮想環境を切り替えるのは、切り替え忘れによる事故のもとになる）。
+#
+# uv のワークスペース機能を使うと、各プロジェクトが自分の必要な
+# ライブラリを宣言したまま、環境は1つにまとめられる。
+
+[project]
+name = "data-science-portfolio"
+version = "0.1.0"
+description = "データ分析プロジェクトをまとめたリポジトリ"
+requires-python = ">=3.11"
+dependencies = ["spacex-capstone"]
+
+[tool.uv]
+# この親自体はライブラリではなく、まとめ役なのでビルドしない。
+package = false
+
+[tool.uv.workspace]
+members = ["ibm-capstone-spacex"]
+
+[tool.uv.sources]
+spacex-capstone = { workspace = true }
+
+[dependency-groups]
+# 開発時にだけ使う道具。配布物には含まれない。
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+# --- 静的検査の設定 ---------------------------------------------------------
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+# ノートブックは検査の対象にしない。
+# 課題に取り組んだときの記録として当時のまま保存しているものなので、
+# 今の書き方に合わせて直すと、記録としての価値が失われる。
+# 保守する対象は src/ に切り出したほうであり、そちらは検査する。
+extend-exclude = ["**/notebooks/**"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # 書式（行の長さ、空白）
+    "F",   # 未使用の変数・import など、実行前に分かる誤り
+    "I",   # import の並び順
+    "UP",  # 古い書き方の指摘
+    "B",   # よくある間違いやすい書き方
+    "SIM", # 冗長な書き方の指摘
+]
+
+[tool.ruff.lint.per-file-ignores]
+# テストの関数名は日本語で書いており、長くなる。
+"**/tests/*" = ["E501"]
+
+[tool.ruff.lint.isort]
+# このリポジトリ内のパッケージを「自分のもの」として区別し、
+# 外部ライブラリとは別の塊に並べる。どこまでが自作かが一目で分かる。
+known-first-party = ["spacex_capstone"]
+
+# --- テストの設定 -----------------------------------------------------------
+
+[tool.pytest.ini_options]
+testpaths = ["ibm-capstone-spacex/tests"]
+pythonpath = ["ibm-capstone-spacex"]
+addopts = "-q --strict-markers"

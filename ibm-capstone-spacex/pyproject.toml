@@ -1,0 +1,35 @@
+[project]
+name = "spacex-capstone"
+version = "1.0.0"
+description = "SpaceX の第1段ロケット着陸成否を予測する分析プロジェクト"
+requires-python = ">=3.11"
+
+# ここに並ぶのは src/ の中で実際に import しているものだけ。
+# 「入れておけば動く」で増やすと、何が本当に必要かが分からなくなる。
+dependencies = [
+    "pandas>=2.0",
+    "numpy>=1.26",
+    "requests>=2.31",       # Web API からの取得
+    "beautifulsoup4>=4.12", # HTML の解析
+    "scikit-learn>=1.4",    # 予測モデル
+    "matplotlib>=3.8",      # 図
+    "folium>=0.15",         # 地図
+]
+
+[project.optional-dependencies]
+# ノートブックを開いて実行するときだけ必要なもの。
+# 検査やテストには要らないので、既定では入れない。
+notebooks = [
+    "jupyterlab>=4.0",
+    "seaborn>=0.13",
+    "ipython-sql>=0.5",
+    "sqlalchemy>=2.0",
+    "html5lib>=1.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/spacex_capstone"]

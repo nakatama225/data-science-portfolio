@@ -1,0 +1,33 @@
+# 仮想環境・依存
+.venv/
+__pycache__/
+*.py[cod]
+
+# ビルド・配布物
+build/
+dist/
+*.egg-info/
+
+# テスト・ツールのキャッシュ
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# エディタ・OS
+.DS_Store
+.vscode/
+.idea/
+
+# 認証情報（誤って置いた場合の保険）
+*.pem
+*.key
+
+# Kaggle のコンペデータ。再配布できない規約のものがあるため、
+# 誤ってコミットしないようリポジトリに入れない。
+kaggle/*/data/*
+!kaggle/*/data/.gitkeep
