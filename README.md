@@ -26,8 +26,8 @@
 
 関連リポジトリ（このリポジトリの外）：
 
-- [animal-bomber-ts](https://github.com/nakatama225/animal-bomber-ts) — 対戦ゲームの TypeScript 実装
-- [animal-bomber-py](https://github.com/nakatama225/animal-bomber-py) — 同じゲームの Python 実装
+- [algorithms-and-patterns](https://github.com/nakatama225/algorithms-and-patterns) — アルゴリズムと設計パターンを再利用できる部品として実装したもの
+- [animal-bomber](https://github.com/nakatama225/animal-bomber) — 対戦ゲーム。同じゲームの TypeScript 版と Python 版
 
 ## Design Choice — 構成と、その理由
 
