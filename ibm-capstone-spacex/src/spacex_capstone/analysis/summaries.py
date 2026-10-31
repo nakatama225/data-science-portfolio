@@ -33,9 +33,10 @@ def success_rate_by(
         成功率の高い順に並ぶ。成功率が同じ分類は、分類の値の順に並ぶ。
 
     Note:
-        pandas の既定の並べ方は同点の順を保つと決まっておらず、17 行以上の表で
-        入れ替える。同点の順を保つ並べ方（`kind="stable"`）を指定し、
-        集計が並べた分類の値の順を残している。
+        pandas の既定の並べ方は同点の順を保つと決まっておらず、入れ替えることがある
+        （pandas 3.0.5・numpy 2.5.2 では、同点を含む 17 行以上の表で入れ替わった）。
+        同点の順を保つ並べ方（`kind="stable"`）を指定し、集計が並べた分類の値の順を
+        残している。
     """
     grouped = frame.groupby(group_column)[target_column]
     summary = grouped.agg(success_rate="mean", launches="count").reset_index()
@@ -94,7 +95,8 @@ def payload_range_summary(
 
     Returns:
         `payload_range` / `success_rate` / `launches` の3列を持つ表。
-        件数の合計は、渡した表の行数に等しい。
+        重量の欠けと区切りの外では止めるので、重量のせいで件数から消える行は無い
+        （件数は目的変数を数えるので、目的変数が欠けた行は入らない）。
 
     Raises:
         ValueError: 区切りが昇順でない、または2つ未満のとき。重量が欠けた行か、

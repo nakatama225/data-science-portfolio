@@ -149,8 +149,9 @@ def comparison_table(scores: Sequence[ClassificationScores]) -> Any:
         F1 の高い順に並べた表。F1 が同じモデルは、渡した順のまま並ぶ。
 
     Note:
-        pandas の既定の並べ方は同点の順を保つと決まっておらず、17 行以上の表で
-        入れ替える。同点の順を保つ並べ方（`kind="stable"`）を指定している。
+        pandas の既定の並べ方は同点の順を保つと決まっておらず、入れ替えることがある
+        （pandas 3.0.5・numpy 2.5.2 では、同点を含む 17 行以上の表で入れ替わった）。
+        同点の順を保つ並べ方（`kind="stable"`）を指定している。
     """
     import pandas as pd
 

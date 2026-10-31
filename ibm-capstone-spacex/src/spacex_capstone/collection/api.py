@@ -231,6 +231,8 @@ class SpaceXLaunchCollector:
             block=core.get("block"),
             # 機体の記録が無ければ、再使用の回数も分からない。0 にすると「一度も
             # 再使用していない」と区別できない（元のノートブックも None にしている）。
+            # 記録があるのに回数の項目が無い応答は想定外なので、0 に丸めず KeyError で
+            # 止める（元のノートブックも添字で読む）。
             reused_count=core["reuse_count"] if core_id else None,
             serial=core.get("serial"),
         )
