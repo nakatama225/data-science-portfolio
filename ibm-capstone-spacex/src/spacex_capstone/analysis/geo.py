@@ -80,6 +80,10 @@ def haversine_distance_km(origin: Coordinate, destination: Coordinate) -> float:
         math.sin(delta_lat / 2) ** 2
         + math.cos(lat1) * math.cos(lat2) * math.sin(delta_lon / 2) ** 2
     )
+    # 計算上は 1 を超えないが、地球のほぼ反対側にある2点では、小数の計算の丸めで
+    # 1 をわずかに超えることがある（例：(-87.5, -180) と (87.5, 0)）。そのままだと
+    # 1 - chord が負になり、平方根が ValueError で止まるので、1 で頭打ちにする。
+    chord = min(chord, 1.0)
     central_angle = 2 * math.atan2(math.sqrt(chord), math.sqrt(1 - chord))
     return EARTH_RADIUS_KM * central_angle
 
