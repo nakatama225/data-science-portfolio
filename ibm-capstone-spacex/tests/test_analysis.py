@@ -75,7 +75,7 @@ class Test距離の計算:
 
         assert at_60_north == pytest.approx(at_equator / 2, rel=0.01)
 
-    def test_地球のほぼ反対側の2点でも止まらず半周を返す(self) -> None:
+    def test_地球の反対側の2点でも止まらず半周を返す(self) -> None:
         """計算の途中の値が、小数の丸めで 1 をわずかに超える組。
 
         頭打ちにしないと、平方根に負の数を渡して ValueError で止まる。
