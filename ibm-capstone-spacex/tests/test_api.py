@@ -77,7 +77,7 @@ def test_機体IDが無い打ち上げでも記録を作れる(fetcher: FakeFetc
 
     assert record.serial is None
     assert record.block is None
-    assert record.reused_count == 0
+    assert record.reused_count is None
     assert record.outcome == "None None"
 
 

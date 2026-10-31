@@ -68,6 +68,17 @@ class Test不正な入力:
         with pytest.raises(ValueError, match="未知の着陸方式"):
             LandingOutcome.parse("True Balloon")
 
+    @pytest.mark.parametrize("raw", ["True None", "False None"])
+    def test_着陸を試みていないのに成否がある表記は例外(self, raw: str) -> None:
+        """方式が `None`（試みていない）なら、成否も `None` のはず。
+
+        `True None` を通すと、試みていないのに成功した打ち上げになり、
+        「試みていなければ成功ではない」という約束が崩れる。
+        どちらもこのデータには現れない。
+        """
+        with pytest.raises(ValueError, match="試みていない"):
+            LandingOutcome.parse(raw)
+
 
 def test_設定に列挙した失敗コードと判定規則が一致する() -> None:
     """同じことが2か所に書かれている状態への番人。

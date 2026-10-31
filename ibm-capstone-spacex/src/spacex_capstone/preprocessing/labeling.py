@@ -95,8 +95,9 @@ class LandingOutcome:
             raw: `<成否> <方式>` の2語。
 
         Raises:
-            ValueError: 2語に分かれていない、または成否が
-                `True` / `False` / `None` のいずれでもないとき。
+            ValueError: 2語に分かれていない、成否が
+                `True` / `False` / `None` のいずれでもない、または
+                着陸を試みていない（方式が `None`）のに成否が `None` でないとき。
         """
         parts = raw.split()
         if len(parts) != 2:
@@ -107,6 +108,9 @@ class LandingOutcome:
             raise ValueError(f"未知の成否表記: {success_token!r}")
 
         method = LandingMethod.from_raw(method_token)
+        # `True None` を通すと、試みていないのに成功した打ち上げになる。
+        if method is LandingMethod.NOT_ATTEMPTED and success_token != "None":
+            raise ValueError(f"着陸を試みていないのに成否がある: {raw!r}")
         return cls(
             succeeded=success_token == "True",
             attempted=method is not LandingMethod.NOT_ATTEMPTED,

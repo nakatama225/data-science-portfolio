@@ -124,8 +124,8 @@ class LaunchRecord:
     block: float | None
     """機体の世代番号。大きいほど新しい設計。"""
 
-    reused_count: int
-    """この機体がそれまでに再使用された回数。"""
+    reused_count: int | None
+    """この機体がそれまでに再使用された回数。機体の記録が無い打ち上げは `None`。"""
 
     serial: str | None
     """機体の個体識別番号（例: B1049）。"""
@@ -229,7 +229,9 @@ class SpaceXLaunchCollector:
             legs=core_entry["legs"],
             landing_pad=core_entry.get("landpad"),
             block=core.get("block"),
-            reused_count=core.get("reuse_count", 0),
+            # 機体の記録が無ければ、再使用の回数も分からない。0 にすると「一度も
+            # 再使用していない」と区別できない（元のノートブックも None にしている）。
+            reused_count=core["reuse_count"] if core_id else None,
             serial=core.get("serial"),
         )
 
@@ -259,6 +261,9 @@ def records_to_frame(records: Iterable[LaunchRecord]) -> Any:
     （`FlightNumber`、`PayloadMass` のような大文字始まり）に合わせている。
     Python の慣習とは違うが、**すでに保存されている CSV の列名と
     食い違わせないこと** を優先した。
+
+    機体の記録が無い打ち上げが1件でも混じると、`ReusedCount` の列は
+    欠損（NaN）を含む小数の列になる。CSV に書くと `3` ではなく `3.0` になる。
     """
     import pandas as pd
 

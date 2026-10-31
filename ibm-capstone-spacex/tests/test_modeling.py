@@ -270,3 +270,24 @@ def test_比較表はF1の高い順に並ぶ() -> None:
     table = comparison_table([weak, strong])
 
     assert list(table["モデル"]) == ["強い", "弱い"]
+
+
+def test_比較表の同点は渡した順に並ぶ() -> None:
+    """F1 が同じモデルは、渡した順のまま並ぶ。
+
+    pandas の既定の並べ方は同点の順を保つと決まっておらず、17 行以上の表で
+    入れ替えた。同点の順が表の大きさで変わると、表を見比べたときに順位が
+    変わったように見える。
+    """
+    target = np.array([1, 1, 0, 0])
+    names = [f"モデル{i:02d}" for i in range(20)]
+    scores = [
+        score_model(
+            name, _FixedEstimator(target if i % 2 else np.zeros(4)), None, target
+        )
+        for i, name in enumerate(names)
+    ]
+
+    table = comparison_table(scores)
+
+    assert list(table["モデル"]) == names[1::2] + names[0::2]

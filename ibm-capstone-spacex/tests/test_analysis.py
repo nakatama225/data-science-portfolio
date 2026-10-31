@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import math
 
+import pandas as pd
 import pytest
 
 from spacex_capstone.analysis.geo import (
@@ -121,6 +122,15 @@ class Test成功率の集計:
         assert "launches" in result.columns
         assert result["launches"].sum() == len(labelled_frame)
 
+    def test_同じ成功率の分類は分類の値の順に並ぶ(self) -> None:
+        """pandas の既定の並べ方は、17 行以上の表で同点の順を入れ替えた。"""
+        sites = [f"発射場{i:02d}" for i in range(20)]
+        frame = pd.DataFrame({"LaunchSite": sites, "Class": [i % 2 for i in range(20)]})
+
+        result = success_rate_by(frame, "LaunchSite")
+
+        assert list(result["LaunchSite"]) == sites[1::2] + sites[0::2]
+
 
 class Test年ごとの推移:
     def test_年で集約する(self, labelled_frame) -> None:
@@ -158,3 +168,19 @@ class Test重量帯ごとの集計:
     def test_区切りが1つでは集計できない(self, labelled_frame) -> None:
         with pytest.raises(ValueError, match="2つ以上"):
             payload_range_summary(labelled_frame, bin_edges=(0.0,))
+
+    def test_区切りの外の重量があれば止まる(self, labelled_frame) -> None:
+        """区切りの外の重量はどの帯にも入らず、黙って件数から消える。
+
+        重量は 3000 / 6000 / 9000 kg なので、5000 までの区切りでは2件が外に出る。
+        """
+        with pytest.raises(ValueError, match="区切りの外の重量が 2 件"):
+            payload_range_summary(labelled_frame, bin_edges=(0.0, 5000.0))
+
+    def test_重量が欠けた行があれば止まる(self, labelled_frame) -> None:
+        """欠けた重量も、区切りの外と同じく、どの帯にも入らず件数から消える。"""
+        missing = labelled_frame.copy()
+        missing.loc[missing.index[0], "PayloadMass"] = float("nan")
+
+        with pytest.raises(ValueError, match="欠けた行が 1 件"):
+            payload_range_summary(missing, bin_edges=(0.0, 10000.0))

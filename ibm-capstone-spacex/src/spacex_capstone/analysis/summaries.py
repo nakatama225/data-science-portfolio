@@ -30,11 +30,18 @@ def success_rate_by(
 
     Returns:
         `group_column` / `success_rate` / `launches` の3列を持つ表。
-        成功率の高い順に並ぶ。
+        成功率の高い順に並ぶ。成功率が同じ分類は、分類の値の順に並ぶ。
+
+    Note:
+        pandas の既定の並べ方は同点の順を保つと決まっておらず、17 行以上の表で
+        入れ替える。同点の順を保つ並べ方（`kind="stable"`）を指定し、
+        集計が並べた分類の値の順を残している。
     """
     grouped = frame.groupby(group_column)[target_column]
     summary = grouped.agg(success_rate="mean", launches="count").reset_index()
-    return summary.sort_values("success_rate", ascending=False).reset_index(drop=True)
+    return summary.sort_values(
+        "success_rate", ascending=False, kind="stable"
+    ).reset_index(drop=True)
 
 
 def yearly_success_rate(
@@ -87,9 +94,12 @@ def payload_range_summary(
 
     Returns:
         `payload_range` / `success_rate` / `launches` の3列を持つ表。
+        件数の合計は、渡した表の行数に等しい。
 
     Raises:
-        ValueError: 区切りが昇順でない、または2つ未満のとき。
+        ValueError: 区切りが昇順でない、または2つ未満のとき。重量が欠けた行か、
+            区切りの外の重量があるとき。どちらもどの帯にも入らず、黙って件数から
+            消えるので、止めて知らせる。
     """
     import pandas as pd
 
@@ -98,10 +108,17 @@ def payload_range_summary(
     if list(bin_edges) != sorted(bin_edges):
         raise ValueError(f"区切りが昇順でない: {bin_edges}")
 
+    missing = int(frame[mass_column].isna().sum())
+    if missing:
+        raise ValueError(f"重量が欠けた行が {missing} 件ある。先に埋めるか除く")
+
     binned = frame.copy()
     binned["payload_range"] = pd.cut(
         binned[mass_column], bins=list(bin_edges), include_lowest=True
     )
+    outside = int(binned["payload_range"].isna().sum())
+    if outside:
+        raise ValueError(f"区切りの外の重量が {outside} 件ある: 区切り {bin_edges}")
 
     grouped = binned.groupby("payload_range", observed=False)[target_column]
     summary = grouped.agg(success_rate="mean", launches="count").reset_index()

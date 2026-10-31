@@ -75,6 +75,11 @@ def impute_payload_mass(
 
     Returns:
         埋めたあとの表と、何件をどの値で埋めたかの記録。
+
+    Note:
+        平均は渡した表の全件で取る。訓練用と検証用に分ける前に呼ぶと、検証用の
+        重量も平均に混ざる（README の「既知の限界」。学習が読む CSV も、ノートブックで
+        同じ形に埋めたあとのもの）。
     """
     filled = frame.copy()
     missing_count = int(filled[column].isna().sum())
