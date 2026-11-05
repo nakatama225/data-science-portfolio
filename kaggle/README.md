@@ -6,7 +6,7 @@ Kaggle コンペティションへの参加記録と提出物。
 
 | コンペ | 順位 / スコア | 取り組み |
 |---|---|---|
-| （参加後にここへ追記する） | | |
+| [Deep Past Challenge - Translate Akkadian to English](deep-past-initiative-machine-translation/) | 276 位 / 2,674 チーム（35.8478） | アッカド語の翻字を英語に訳す。最終順位の元になった公開ノートブックのコードに、日本語の説明を付けた。2つの ByT5 の候補を最小ベイズリスク（MBR）で選ぶ推論 |
 
 ## ディレクトリの作り方
 

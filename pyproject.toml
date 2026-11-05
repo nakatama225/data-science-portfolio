@@ -62,6 +62,9 @@ known-first-party = ["spacex_capstone"]
 # --- テストの設定 -----------------------------------------------------------
 
 [tool.pytest.ini_options]
-testpaths = ["ibm-capstone-spacex/tests"]
+testpaths = [
+    "ibm-capstone-spacex/tests",
+    "kaggle/deep-past-initiative-machine-translation/tests",
+]
 pythonpath = ["ibm-capstone-spacex"]
 addopts = "-q --strict-markers"
